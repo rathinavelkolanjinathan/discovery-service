@@ -64,6 +64,9 @@ server:
     trust-store: classpath:dev-truststore.p12
     custom-trust-store-password: classpath:custom-dev-truststore.p12
 
+cipher:
+  secretKey:
+
 ---
 
 spring:
@@ -85,6 +88,9 @@ server:
     trust-store: classpath:dev-truststore.p12
     custom-trust-store-password: classpath:custom-uat-truststore.p12
 
+cipher:
+  secretKey:
+
 ---
 
 spring:
@@ -105,3 +111,6 @@ server:
     custom-key-store-password: classpath:custom-uat-keystore.p12
     trust-store: classpath:dev-truststore.p12
     custom-trust-store-password: classpath:custom-uat-truststore.p12
+
+cipher:
+  secretKey:
