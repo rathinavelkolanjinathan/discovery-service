@@ -1,0 +1,107 @@
+spring:
+  application :
+    name: discovery-service
+
+server:
+  port: 8086
+  ssl:
+    enabled: false
+    key-store: classpath:keystore.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+    key-alias: tomcat
+
+spring.mvc.async.request-timeout: 600000
+server.shutdown: graceful
+spring.lifecycle.timeout-per-shutdown-phase: 20s
+
+eureka:
+  instance:
+    metadata-map:
+      secure: ${server.ssl.enabled:false}
+      zone: ${CURRENT_HOST_NAME:localhost}
+    hostname: ${CURRENT_HOST_NAME:localhost}
+    secure-port-enabled: ${server.ssl.enabled:false}
+    secure-port: ${server.port}
+  client:
+    register-with-eureka: {IS_MULTI_NODE_ENV:false}
+    fetch-registry: {IS_MULTI_NODE_ENV:false}
+    service-url:
+      defaultZone: ${EUREKA_PEER:http://localhost:8761/eureka/}
+    healthcheck:
+      enabled: true
+
+logging:
+  level:
+    root: info
+    com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver: WARN
+    com.netflix.eureka.registry.AbstractInstanceRegistry: WARN
+    com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl: WARN
+  file:
+    max-history: 30
+
+cipher:
+  secretKey:
+
+---
+
+spring:
+  config :
+    activate:
+      on-profile: dev
+
+server:
+  ssl:
+    enabled: false
+    ciphers:
+      -TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      -TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    enabled-protocols:
+      -TLSv1.2
+      -TLSv1.3
+    key-store: classpath:dev-keystore.p12
+    custom-key-store-password: classpath:custom-dev-keystore.p12
+    trust-store: classpath:dev-truststore.p12
+    custom-trust-store-password: classpath:custom-dev-truststore.p12
+
+---
+
+spring:
+  config :
+    activate:
+      on-profile: uat
+
+server:
+  ssl:
+    enabled: false
+    ciphers:
+      -TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      -TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    enabled-protocols:
+      -TLSv1.2
+      -TLSv1.3
+    key-store: classpath:uat-keystore.p12
+    custom-key-store-password: classpath:custom-uat-keystore.p12
+    trust-store: classpath:dev-truststore.p12
+    custom-trust-store-password: classpath:custom-uat-truststore.p12
+
+---
+
+spring:
+  config :
+    activate:
+      on-profile: prod
+
+server:
+  ssl:
+    enabled: false
+    ciphers:
+      -TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      -TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    enabled-protocols:
+      -TLSv1.2
+      -TLSv1.3
+    key-store: classpath:uat-keystore.p12
+    custom-key-store-password: classpath:custom-uat-keystore.p12
+    trust-store: classpath:dev-truststore.p12
+    custom-trust-store-password: classpath:custom-uat-truststore.p12

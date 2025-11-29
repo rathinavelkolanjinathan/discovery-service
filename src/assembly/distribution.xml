@@ -1,0 +1,51 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 https://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>distribution</id>
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+
+    <!-- Include the jar file -->
+    <!--<baseDirectory>${project.artifactId}-${project.version}</baseDirectory>-->
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>${project.build.finalName}.jar</include>
+                <!--<include>dependency-jars/*.jar</include>-->
+            </includes>
+
+        </fileSet>
+        <!--Include application.yml and logback.xml file -->
+
+
+        <fileSet>
+            <directory>${project.basedir}/src/mail/resource</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>/**</include>
+                <!--<include>dependency-jars/*.jar</include>-->
+            </includes>
+
+        </fileSet>
+
+        <!-- Include shel scripts and config files from ansible directory -->
+        <fileSet>
+            <directory>${project.basedir}/ansible</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>shell/**</include>
+                <include>config/**</include>
+                <!--<include>dependency-jars/*.jar</include>-->
+            </includes>
+
+        </fileSet>
+
+    </fileSets>
+
+</assembly>
