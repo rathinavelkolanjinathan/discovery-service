@@ -6,14 +6,20 @@ server:
   port: 8086
   ssl:
     enabled: false
-    key-store: classpath:keystore.p12
-    key-store-password: changeit
-    key-store-type: PKCS12
-    key-alias: tomcat
 
 spring.mvc.async.request-timeout: 600000
+
 server.shutdown: graceful
 spring.lifecycle.timeout-per-shutdown-phase: 20s
+
+logging:
+  level:
+    root: INFO
+    com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver: WARN
+    com.netflix.eureka.registry.AbstractInstanceRegistry: WARN
+    com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl: WARN
+  file:
+    max-history: 7
 
 eureka:
   instance:
@@ -27,21 +33,12 @@ eureka:
     register-with-eureka: {IS_MULTI_NODE_ENV:false}
     fetch-registry: {IS_MULTI_NODE_ENV:false}
     service-url:
-      defaultZone: ${EUREKA_PEER:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_PEER:http://localhost:8086/eureka/}
     healthcheck:
       enabled: true
 
-logging:
-  level:
-    root: info
-    com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver: WARN
-    com.netflix.eureka.registry.AbstractInstanceRegistry: WARN
-    com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl: WARN
-  file:
-    max-history: 30
-
 cipher:
-  secretKey:
+  secretKey: FMbrDz2FnQQKR0fjQLX/ZHUQAcNp6VBcp3j813tD7r4=
 
 ---
 
@@ -65,7 +62,7 @@ server:
     custom-trust-store-password: classpath:custom-dev-truststore.p12
 
 cipher:
-  secretKey:
+  secretKey: FMbrDz2FnQQKR0fjQLX/ZHUQAcNp6VBcp3j813tD7r4=
 
 ---
 
@@ -89,7 +86,7 @@ server:
     custom-trust-store-password: classpath:custom-uat-truststore.p12
 
 cipher:
-  secretKey:
+  secretKey: FMbrDz2FnQQKR0fjQLX/ZHUQAcNp6VBcp3j813tD7r4=
 
 ---
 
@@ -113,4 +110,4 @@ server:
     custom-trust-store-password: classpath:custom-uat-truststore.p12
 
 cipher:
-  secretKey:
+  secretKey: FMbrDz2FnQQKR0fjQLX/ZHUQAcNp6VBcp3j813tD7r4=

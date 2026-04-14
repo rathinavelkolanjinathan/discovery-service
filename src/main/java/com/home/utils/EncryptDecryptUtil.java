@@ -7,15 +7,21 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
 
 @Component
 public class EncryptDecryptUtil {
     private static final String ALGORITHM = "AES";
     private static final int KEY_SIZE = 256;
-    @Value("$cipher.secretKey")
+    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final int IV_SIZE = 12;
+    private static final int TAG_LENGTH_BIT = 128;
+    // 16 bytes IV for AES
+    @Value("${cipher.secretKey}")
     private String SECRET_KEY_STR;
     private SecretKey SECRET_KEY;
 
@@ -31,7 +37,7 @@ public class EncryptDecryptUtil {
     }
 
     private SecretKey stringToSecretKey(String keyAsString) throws NoSuchAlgorithmException {
-        if (keyAsString == null) {
+        if (keyAsString == null || keyAsString.isEmpty()) {
             keyAsString = getSecretKeyToString();
         }
         byte[] decodeKey = Base64.getDecoder().decode(keyAsString);
@@ -61,17 +67,29 @@ public class EncryptDecryptUtil {
     }
 
     public String encrypt(String plainText) throws Exception {
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, getSecret());
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        byte[] iv = new byte[IV_SIZE];
+        new SecureRandom().nextBytes(iv);
+        GCMParameterSpec spec = new GCMParameterSpec(TAG_LENGTH_BIT, iv);
+        cipher.init(Cipher.ENCRYPT_MODE, getSecret(),spec);
         byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
+        byte[] encryptedBytesIv = new byte[IV_SIZE + encryptedBytes.length];
+        System.arraycopy(iv, 0, encryptedBytesIv, 0, IV_SIZE);
+        System.arraycopy(encryptedBytes, 0, encryptedBytesIv, IV_SIZE, encryptedBytes.length);
         return Base64.getEncoder().encodeToString(encryptedBytes);
 
     }
 
     public String decrypt(String cipherText) throws Exception {
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, getSecret());
-        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+        byte[] encryptedWithIv = Base64.getDecoder().decode(cipherText);
+        byte[] iv = new byte[IV_SIZE];
+        System.arraycopy( encryptedWithIv, 0,iv,0, IV_SIZE);
+        GCMParameterSpec spec = new GCMParameterSpec(TAG_LENGTH_BIT, iv);
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        cipher.init(Cipher.ENCRYPT_MODE, getSecret(),spec);
+        byte[] encryptedBytes = new byte[ encryptedWithIv.length-IV_SIZE];
+        System.arraycopy(encryptedWithIv, IV_SIZE,encryptedBytes,0, encryptedBytes.length);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
         return new String(decryptedBytes);
     }
 
