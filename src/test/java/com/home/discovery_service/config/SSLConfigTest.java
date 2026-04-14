@@ -63,9 +63,7 @@ private SSLConfig sslConfig;
     void throwsExceptionWhenTruststorePasswordDecryptionFails() throws Exception {
     when(encryptDecryptUtil.decrypt("encryptedKeystorePassword")).thenReturn("keystorePassword");
     when(encryptDecryptUtil.decrypt("encryptedTruststorePassword")).thenThrow(new RuntimeException("Decryption failed"));
-
     ConfigurableWebServerFactory factory = mock(ConfigurableWebServerFactory.class);
-
     assertThrows(RuntimeException.class, () -> sslConfig.sslCustomizer().customize(factory));
 
 }
